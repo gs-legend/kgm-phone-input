@@ -791,14 +791,13 @@ class PhoneInput extends React.Component {
         top: rect.y + window.scrollY + rect.height / 2,
       };
 
-      this.setState({
-        dropdownContainerStyle: {
+        const dropdownContainerStyle={
           position: `absolute`,
           width: `auto`,
           top: `${coords.top}px`,
           left: `${coords.left}px`,
-        },
-      });
+        };
+        this.countryDropdownContainerRef.style = dropdownContainerStyle;
     }
   };
 
@@ -962,17 +961,15 @@ class PhoneInput extends React.Component {
           top: rect.y + window.scrollY + rect.height / 2,
         };
 
-        this.setState({
-          dropdownContainerStyle: {
-            position: `absolute`,
-            width: `auto`,
-            top: `${coords.top}px`,
-            left: `${coords.left}px`,
-          },
-        });
+        const dropdownContainerStyle = {
+          position: `absolute`,
+          width: `auto`,
+          top: `${coords.top}px`,
+          left: `${coords.left}px`,
+        };
 
         return createPortal(
-          <div className="react-tel-input" style={this.state.dropdownContainerStyle}>
+          <div className="react-tel-input" ref={(el) => (this.countryDropdownContainerRef = el)} style={dropdownContainerStyle}>
             {this.getCountryDropdownList()}
           </div>,
           document.body
