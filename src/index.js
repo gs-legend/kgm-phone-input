@@ -782,22 +782,14 @@ class PhoneInput extends React.Component {
   };
 
   handleScroll = (e) => {
+    let dropdownContainer = this.dropdownContainerRef;
     const { appendToBody } = this.props;
 
-    if (appendToBody && this.state.showDropdown) {
-      const rect = this.dropdownContainerRef && this.dropdownContainerRef.getBoundingClientRect();
-      const coords = {
-        left: rect.x,
-        top: rect.y + window.scrollY + rect.height / 2,
-      };
-
-        const dropdownContainerStyle={
-          position: `absolute`,
-          width: `auto`,
-          top: `${coords.top}px`,
-          left: `${coords.left}px`,
-        };
-        this.countryDropdownContainerRef.style = dropdownContainerStyle;
+    if (appendToBody) {
+      dropdownContainer = document.body;
+    }
+    if (this.dropdownRef && !dropdownContainer.contains(e.target)) {
+      this.state.showDropdown && this.setState({ showDropdown: false });
     }
   };
 
