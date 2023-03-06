@@ -49,17 +49,17 @@ export default App
 ```
 #### 2. Example to use within Grid
 ```jsx
-import { AgGridReact } from "ag-grid-react";
+ import { AgGridReact } from "ag-grid-react";
 import PhoneInput from "kgm-phone-input";
 import { useState } from "react";
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
-import 'kgm-phone-input/lib/style.css';
+import '../../lib/style.css';
 
 function PhoneInputRenderer(params: any) {
   return (
     <span>
-      <PhoneInput dropdownContainerId={params.data.test ? "id" + Math.random() : undefined} country={'in'} value={params.value} />
+      <PhoneInput appendToBody={params.data.test} country={'in'} value={params.value} />
     </span>
   );
 }
@@ -90,6 +90,5 @@ function App() {
 }
 
 export default App
-
 
 ``` 
