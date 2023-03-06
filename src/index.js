@@ -70,7 +70,7 @@ class PhoneInput extends React.Component {
     enableAreaCodeStretch: PropTypes.bool,
     enableClickOutside: PropTypes.bool,
     showDropdown: PropTypes.bool,
-    appendToBody: PropTypes.bool,
+    appendTocontainerId: PropTypes.bool,
     onChange: PropTypes.func,
     onFocus: PropTypes.func,
     onBlur: PropTypes.func,
@@ -764,10 +764,10 @@ class PhoneInput extends React.Component {
 
   handleClickOutside = (e) => {
     let dropdownContainer = this.dropdownContainerRef;
-    const { appendToBody } = this.props;
+    const { appendTocontainerId } = this.props;
 
-    if (appendToBody) {
-      dropdownContainer = document.body;
+    if (appendTocontainerId) {
+      dropdownContainer = document.getElementById(appendTocontainerId) || document.body;
     }
     if (this.dropdownRef && !dropdownContainer.contains(e.target)) {
       this.state.showDropdown && this.setState({ showDropdown: false });
@@ -925,8 +925,8 @@ class PhoneInput extends React.Component {
   };
 
   showDropdown = () => {
-    const { appendToBody } = this.props;
-    if (appendToBody) {
+    const { appendTocontainerId } = this.props;
+    if (appendTocontainerId) {
       if (this.dropdownContainerRef) {
         const rect = this.dropdownContainerRef && this.dropdownContainerRef.getBoundingClientRect();
         const coords = {
@@ -945,7 +945,7 @@ class PhoneInput extends React.Component {
           <div className="react-tel-input" style={style}>
             {this.getCountryDropdownList()}
           </div>
-        ,document.body);
+        ,document.getElementById(appendTocontainerId) || document.body);
       }
     }
     return this.getCountryDropdownList();

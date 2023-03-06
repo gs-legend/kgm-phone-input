@@ -79,7 +79,6 @@ if (TARGET === 'build_js' || TARGET === 'analyze') {
   module.exports = merge(common, {
     mode: 'production',
     optimization: {},
-    devtool: 'inline-source-map',
     output: {
       library: 'ReactPhoneInput',
       libraryTarget: 'commonjs2',
