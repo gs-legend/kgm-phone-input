@@ -1,6 +1,6 @@
 {
   "name": "kgm-phone-input",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Phone Input to show dropdown inside a Container/Grid",
   "main": "lib/lib.js",
   "typings": "index.d.ts",
