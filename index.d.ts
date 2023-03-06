@@ -96,7 +96,7 @@ declare module "kgm-phone-input" {
     enableAreaCodeStretch?: boolean;
     enableClickOutside?: boolean;
     showDropdown?: boolean;
-    appendTocontainerId?: string;
+    appendToBody?: boolean;
     defaultErrorMessage?: string;
     specialLabel?: string;
     disableInitialCountryGuess?: boolean;

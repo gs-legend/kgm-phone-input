@@ -70,7 +70,7 @@ class PhoneInput extends React.Component {
     enableAreaCodeStretch: PropTypes.bool,
     enableClickOutside: PropTypes.bool,
     showDropdown: PropTypes.bool,
-    appendTocontainerId: PropTypes.bool,
+    appendToBody: PropTypes.bool,
     onChange: PropTypes.func,
     onFocus: PropTypes.func,
     onBlur: PropTypes.func,
@@ -219,6 +219,7 @@ class PhoneInput extends React.Component {
       freezeSelection: false,
       debouncedQueryStingSearcher: debounce(this.searchCountry, 250),
       searchValue: "",
+      dropdownContainerStyle: {},
     };
   }
 
@@ -226,11 +227,17 @@ class PhoneInput extends React.Component {
     if (document.addEventListener && this.props.enableClickOutside) {
       document.addEventListener("mousedown", this.handleClickOutside);
     }
+    if (document.addEventListener) {
+      document.addEventListener("mousedown", this.handleScroll);
+    }
   }
 
   componentWillUnmount() {
     if (document.removeEventListener && this.props.enableClickOutside) {
       document.removeEventListener("mousedown", this.handleClickOutside);
+    }
+    if (document.removeEventListener) {
+      document.removeEventListener("mousedown", this.handleScroll);
     }
   }
 
@@ -764,13 +771,34 @@ class PhoneInput extends React.Component {
 
   handleClickOutside = (e) => {
     let dropdownContainer = this.dropdownContainerRef;
-    const { appendTocontainerId } = this.props;
+    const { appendToBody } = this.props;
 
-    if (appendTocontainerId) {
-      dropdownContainer = document.getElementById(appendTocontainerId) || document.body;
+    if (appendToBody) {
+      dropdownContainer = document.body;
     }
     if (this.dropdownRef && !dropdownContainer.contains(e.target)) {
       this.state.showDropdown && this.setState({ showDropdown: false });
+    }
+  };
+
+  handleScroll = (e) => {
+    const { appendToBody } = this.props;
+
+    if (appendToBody && this.state.showDropdown) {
+      const rect = this.dropdownContainerRef && this.dropdownContainerRef.getBoundingClientRect();
+      const coords = {
+        left: rect.x,
+        top: rect.y + window.scrollY + rect.height / 2,
+      };
+
+      this.setState({
+        dropdownContainerStyle: {
+          position: `absolute`,
+          width: `auto`,
+          top: `${coords.top}px`,
+          left: `${coords.left}px`,
+        },
+      });
     }
   };
 
@@ -925,8 +953,8 @@ class PhoneInput extends React.Component {
   };
 
   showDropdown = () => {
-    const { appendTocontainerId } = this.props;
-    if (appendTocontainerId) {
+    const { appendToBody } = this.props;
+    if (appendToBody) {
       if (this.dropdownContainerRef) {
         const rect = this.dropdownContainerRef && this.dropdownContainerRef.getBoundingClientRect();
         const coords = {
@@ -934,18 +962,21 @@ class PhoneInput extends React.Component {
           top: rect.y + window.scrollY + rect.height / 2,
         };
 
-        const style = {
-          position: `absolute`,
-          width: `auto`,
-          top: `${coords.top}px`,
-          left: `${coords.left}px`,
-        };
+        this.setState({
+          dropdownContainerStyle: {
+            position: `absolute`,
+            width: `auto`,
+            top: `${coords.top}px`,
+            left: `${coords.left}px`,
+          },
+        });
 
         return createPortal(
-          <div className="react-tel-input" style={style}>
+          <div className="react-tel-input" style={this.state.dropdownContainerStyle}>
             {this.getCountryDropdownList()}
-          </div>
-        ,document.getElementById(appendTocontainerId) || document.body);
+          </div>,
+          document.body
+        );
       }
     }
     return this.getCountryDropdownList();
