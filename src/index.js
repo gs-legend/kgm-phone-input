@@ -945,7 +945,7 @@ class PhoneInput extends React.Component {
           <div className="react-tel-input" style={style}>
             {this.getCountryDropdownList()}
           </div>
-        );
+        ,document.body);
       }
     }
     return this.getCountryDropdownList();
