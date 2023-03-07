@@ -1,5 +1,4 @@
 import React from 'react';
-import { createPortal } from 'react-dom';
 import PropTypes from 'prop-types';
 import debounce from 'lodash.debounce';
 import memoize from 'lodash.memoize';
@@ -7,8 +6,12 @@ import reduce from 'lodash.reduce';
 import startsWith from 'lodash.startswith';
 import classNames from 'classnames';
 import './utils/prototypes';
+import { createPopper } from '@popperjs/core/lib/popper-lite.js';
+import preventOverflow from '@popperjs/core/lib/modifiers/preventOverflow.js';
+import flip from '@popperjs/core/lib/modifiers/flip.js';
 
 import CountryData from './CountryData.js';
+import { display } from '@mui/system';
 
 class PhoneInput extends React.Component {
   static propTypes = {
@@ -237,14 +240,14 @@ class PhoneInput extends React.Component {
     if (document.addEventListener && this.props.enableClickOutside) {
       document.addEventListener('mousedown', this.handleClickOutside);
     }
+    createPopper(document.querySelector('main'), this.dropdownRef, {
+      placement: 'bottom',
+    });
   }
 
   componentWillUnmount() {
     if (document.removeEventListener && this.props.enableClickOutside) {
       document.removeEventListener('mousedown', this.handleClickOutside);
-    }
-    if (document.removeEventListener) {
-      document.removeEventListener('scroll', this.handleScroll);
     }
   }
 
@@ -627,11 +630,6 @@ class PhoneInput extends React.Component {
 
   handleInputClick = (e) => {
     this.setState({ showDropdown: false });
-    setTimeout(() => {
-      if (document.removeEventListener) {
-        document.removeEventListener('scroll', this.handleScroll);
-      }
-    }, 300);
     if (this.props.onClick) this.props.onClick(e, this.getCountryData());
   };
 
@@ -669,11 +667,6 @@ class PhoneInput extends React.Component {
           this.props.onChange(formattedNumber.replace(/[^0-9]+/g, ''), this.getCountryData(), e, formattedNumber);
       }
     );
-    setTimeout(() => {
-      if (document.removeEventListener) {
-        document.removeEventListener('scroll', this.handleScroll);
-      }
-    }, 300);
   };
 
   handleInputFocus = (e) => {
@@ -808,11 +801,6 @@ class PhoneInput extends React.Component {
           },
           this.cursorToEnd
         );
-        setTimeout(() => {
-          if (document.removeEventListener) {
-            document.removeEventListener('scroll', this.handleScroll);
-          }
-        }, 300);
         break;
       default:
         if ((e.which >= keys.A && e.which <= keys.Z) || e.which === keys.SPACE) {
@@ -835,36 +823,8 @@ class PhoneInput extends React.Component {
   };
 
   handleClickOutside = (e) => {
-    let dropdownContainer = this.dropdownContainerRef;
-    const { appendToBody } = this.props;
-
-    if (appendToBody) {
-      dropdownContainer = document.body;
-    }
-    if (this.dropdownRef && !dropdownContainer.contains(e.target)) {
+    if (this.dropdownRef && !this.dropdownContainerRef.contains(e.target)) {
       this.state.showDropdown && this.setState({ showDropdown: false });
-      setTimeout(() => {
-        if (document.removeEventListener) {
-          document.removeEventListener('scroll', this.handleScroll);
-        }
-      }, 300);
-    }
-  };
-
-  handleScroll = (e) => {
-    let dropdownContainer = this.dropdownContainerRef;
-    const { appendToBody } = this.props;
-
-    if (appendToBody) {
-      dropdownContainer = document.body;
-    }
-    if (this.dropdownRef && !dropdownContainer.contains(e.target)) {
-      this.state.showDropdown && this.setState({ showDropdown: false });
-      setTimeout(() => {
-        if (document.removeEventListener) {
-          document.removeEventListener('scroll', this.handleScroll);
-        }
-      }, 300);
     }
   };
 
@@ -1036,44 +996,6 @@ class PhoneInput extends React.Component {
     );
   };
 
-  showDropdown = () => {
-    const { appendToBody } = this.props;
-    if (appendToBody) {
-      if (this.dropdownContainerRef) {
-        const rect = this.dropdownContainerRef && this.dropdownContainerRef.getBoundingClientRect();
-        const coords = {
-          left: rect.x,
-          top: rect.y + window.scrollY + rect.height / 2
-        };
-
-        const dropdownContainerStyle = {
-          position: `absolute`,
-          width: `auto`,
-          top: `${coords.top}px`,
-          left: `${coords.left}px`
-        };
-
-        setTimeout(() => {
-          if (document.addEventListener) {
-            document.addEventListener('scroll', this.handleScroll);
-          }
-        }, 200);
-
-        return createPortal(
-          <div
-            className="react-tel-input"
-            ref={(el) => (this.countryDropdownContainerRef = el)}
-            style={dropdownContainerStyle}
-          >
-            {this.getCountryDropdownList()}
-          </div>,
-          document.body
-        );
-      }
-    }
-    return this.getCountryDropdownList();
-  };
-
   render() {
     const { onlyCountries, selectedCountry, showDropdown, formattedNumber, hiddenAreaCodes } = this.state;
     const { disableDropdown, renderStringAsFlag, isValid, defaultErrorMessage, specialLabel } = this.props;
@@ -1163,8 +1085,7 @@ class PhoneInput extends React.Component {
               <div className={inputFlagClasses}>{!disableDropdown && <div className={arrowClasses}></div>}</div>
             </div>
           )}
-
-          {showDropdown && this.showDropdown()}
+          <div style={showDropdown ? { display: 'initial' } : { display: 'none' }}>{this.getCountryDropdownList()}</div>
         </div>
       </div>
     );
