@@ -7,21 +7,9 @@ import reduce from 'lodash.reduce';
 import startsWith from 'lodash.startswith';
 import classNames from 'classnames';
 import './utils/prototypes';
-import Popper from '@mui/material/Popper';
 
 import CountryData from './CountryData.js';
-
-const config = { attributes: true, childList: true, subtree: true };
-const callback = function (mutationsList, observer) {
-  for (const mutation of mutationsList) {
-    if (mutation.type === 'childList') {
-      console.log('A child node has been added or removed.');
-    } else if (mutation.type === 'attributes') {
-      console.log('A ' + mutation.attributeName + ' attribute was modified.');
-    }
-  }
-};
-const observer = new MutationObserver(callback);
+import Popper from '@mui/material/Popper';
 
 class PhoneInput extends React.Component {
   static propTypes = {
@@ -84,6 +72,7 @@ class PhoneInput extends React.Component {
     enableClickOutside: PropTypes.bool,
     showDropdown: PropTypes.bool,
     appendToBody: PropTypes.bool,
+    anchorEl:PropTypes.any,
     onChange: PropTypes.func,
     onFocus: PropTypes.func,
     onBlur: PropTypes.func,
@@ -1014,45 +1003,9 @@ class PhoneInput extends React.Component {
     );
   };
 
-  showDropdownList = () => {
-    const { appendToBody } = this.props;
-    if (appendToBody) {
-      if (this.dropdownContainerRef) {
-        const rect = this.dropdownContainerRef && this.dropdownContainerRef.getBoundingClientRect();
-        const coords = {
-          left: rect.x,
-          top: rect.y + window.scrollY + rect.height / 2
-        };
-
-        const dropdownContainerStyle = {
-          position: `fixed`,
-          width: `auto`,
-          top: `${coords.top}px`,
-          left: `${coords.left}px`
-        };
-
-        setTimeout(() => {
-          observer.observe(this.dropdownContainerRef, config);
-        }, 200);
-
-        return createPortal(
-          <div
-            className="react-tel-input"
-            ref={(el) => (this.countryDropdownContainerRef = el)}
-            style={dropdownContainerStyle}
-          >
-            {this.getCountryDropdownList()}
-          </div>,
-          document.body
-        );
-      }
-    }
-    return this.getCountryDropdownList();
-  };
-
   render() {
     const { onlyCountries, selectedCountry, showDropdown, formattedNumber, hiddenAreaCodes } = this.state;
-    const { disableDropdown, renderStringAsFlag, isValid, defaultErrorMessage, specialLabel } = this.props;
+    const { disableDropdown, renderStringAsFlag, isValid, defaultErrorMessage, specialLabel,anchorEl,appendToBody } = this.props;
 
     let isValidValue, errorMessage;
     if (typeof isValid === 'boolean') {
@@ -1139,7 +1092,13 @@ class PhoneInput extends React.Component {
               <div className={inputFlagClasses}>{!disableDropdown && <div className={arrowClasses}></div>}</div>
             </div>
           )}
-          <Popper open={showDropdown}>{this.showDropdownList()}</Popper>
+          {appendToBody ? (
+            <Popper id="react-tel-input-popper" placement="bottom-start" anchorEl={anchorEl.current} className="react-tel-input" open={showDropdown}>
+              {this.getCountryDropdownList()}
+            </Popper>
+          ) : (
+            this.getCountryDropdownList()
+          )}
         </div>
       </div>
     );
@@ -1147,3 +1106,20 @@ class PhoneInput extends React.Component {
 }
 
 export default PhoneInput;
+
+
+// return (
+//   <>
+//     <div ref={anchorEl}>
+//     </div>
+//       <PhoneInput appendToBody={true}
+//         country={'in'} anchorEl={anchorEl}
+//         value={initValue['contactNumber']}
+//         //   dropdownClass={classes.kgmGridSearchOptions}
+//         onChange={(value: string, country: string, e: any, formattedValue: any) =>
+//           debounceOnChange(value, country, e, formattedValue)
+//         }
+//         isValid={isValidPhoneNumber(initValue['contactNumber'], initValue['countryCode']) ? true : false}
+//       />
+//   </>
+// );
