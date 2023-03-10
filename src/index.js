@@ -1,5 +1,4 @@
 import React from 'react';
-import { createPortal } from 'react-dom';
 import PropTypes from 'prop-types';
 import debounce from 'lodash.debounce';
 import memoize from 'lodash.memoize';
@@ -9,7 +8,6 @@ import classNames from 'classnames';
 import './utils/prototypes';
 
 import CountryData from './CountryData.js';
-import Popper from '@mui/material/Popper';
 
 class PhoneInput extends React.Component {
   static propTypes = {
@@ -72,7 +70,8 @@ class PhoneInput extends React.Component {
     enableClickOutside: PropTypes.bool,
     showDropdown: PropTypes.bool,
     appendToBody: PropTypes.bool,
-    anchorEl:PropTypes.any,
+    ContainerEle: PropTypes.any,
+    anchorEl: PropTypes.any,
     onChange: PropTypes.func,
     onFocus: PropTypes.func,
     onBlur: PropTypes.func,
@@ -1005,7 +1004,8 @@ class PhoneInput extends React.Component {
 
   render() {
     const { onlyCountries, selectedCountry, showDropdown, formattedNumber, hiddenAreaCodes } = this.state;
-    const { disableDropdown, renderStringAsFlag, isValid, defaultErrorMessage, specialLabel,anchorEl,appendToBody } = this.props;
+    const { disableDropdown, renderStringAsFlag, isValid, defaultErrorMessage, specialLabel, anchorEl, appendToBody,ContainerEle } =
+      this.props;
 
     let isValidValue, errorMessage;
     if (typeof isValid === 'boolean') {
@@ -1093,9 +1093,24 @@ class PhoneInput extends React.Component {
             </div>
           )}
           {appendToBody ? (
-            <Popper id="react-tel-input-popper" placement="bottom-start" anchorEl={anchorEl.current} className="react-tel-input" open={showDropdown}>
+            <ContainerEle
+              id="react-tel-input-popper"
+              placement="bottom-start"
+              anchorEl={anchorEl.current}
+              className="react-tel-input react-tel-input-popper"
+              style={{ width: 'auto' }}
+              open={showDropdown}
+              // transition
+              // modifiers={{
+              //   preventOverflow: {
+              //     enabled: true,
+              //     escapeWithReference: true,
+              //     boundariesElement: 'scrollParent'
+              //   }
+              // }}
+            >
               {this.getCountryDropdownList()}
-            </Popper>
+            </ContainerEle>
           ) : (
             this.getCountryDropdownList()
           )}
@@ -1106,20 +1121,3 @@ class PhoneInput extends React.Component {
 }
 
 export default PhoneInput;
-
-
-// return (
-//   <>
-//     <div ref={anchorEl}>
-//     </div>
-//       <PhoneInput appendToBody={true}
-//         country={'in'} anchorEl={anchorEl}
-//         value={initValue['contactNumber']}
-//         //   dropdownClass={classes.kgmGridSearchOptions}
-//         onChange={(value: string, country: string, e: any, formattedValue: any) =>
-//           debounceOnChange(value, country, e, formattedValue)
-//         }
-//         isValid={isValidPhoneNumber(initValue['contactNumber'], initValue['countryCode']) ? true : false}
-//       />
-//   </>
-// );
